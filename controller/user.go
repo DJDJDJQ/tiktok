@@ -114,7 +114,7 @@ func Register(c *gin.Context) {
 		}
 
 		model.Mysql.Table("tb_user").Save(&newUser)
-
+		//未处理Error 1406: Data too long for column 'password' at row 1
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "success"},
 			UserId:   newUser.Id,
