@@ -27,7 +27,6 @@ var usersLoginInfo = map[string]Res_User{
 	},
 }
 
-//test
 var userIdSequence = int64(1)
 
 type UserLoginResponse struct {
