@@ -12,7 +12,7 @@ import (
 // test data: username=zhanglei, password=douyin
 var usersLoginInfo = map[string]Res_User{
 	"zhangleidouyin": {
-		Id:            1,
+		Id:            2,
 		Name:          "zhanglei",
 		FollowCount:   10,
 		FollowerCount: 5,

@@ -1,13 +1,38 @@
 package model
 
-import "time"
+import (
+	"database/sql/driver"
+	"time"
+)
+
+type MyBool bool
+
+func (b MyBool) Value() (driver.Value, error) {
+	result := make([]byte, 1)
+	if b {
+		result[0] = byte(1)
+	} else {
+		result[0] = 0
+	}
+	return result, nil
+}
+func (b MyBool) Scan(v interface{}) error {
+	bytes := v.([]byte)
+
+	if bytes[0] == 0 {
+		b = false
+	} else {
+		b = true
+	}
+	return nil
+}
 
 type User struct {
 	Id            int64     `json:"id,omitempty"`
 	Name          string    `json:"name,omitempty"`
 	FollowCount   int64     `json:"follow_count,omitempty"`
 	FollowerCount int64     `json:"follower_count,omitempty"`
-	IsFollow      bool      `json:"is_follow,omitempty"`
+	IsFollow      MyBool    `json:"is_follow,omitempty"`
 	RegisterTime  time.Time `json:"register_time,omitempty"`
 }
 
@@ -18,7 +43,7 @@ type Video struct {
 	CoverUrl      string    `json:"cover_url,omitempty"`
 	FavoriteCount int64     `json:"favorite_count,omitempty"`
 	CommentCount  int64     `json:"comment_count,omitempty"`
-	IsFavorite    bool      `json:"is_favorite,omitempty"`
+	IsFavorite    MyBool    `json:"is_favorite,omitempty"`
 	Title         string    `json:"title,omitempty"`
 	PublishTime   time.Time `json:"publish_time,omitempty"`
 	Status        int8      `json:"status,omitempty"`
@@ -35,7 +60,7 @@ type Favorite struct {
 
 type Comment struct {
 	Id         int64     `json:"id,omitempty"`
-	User       User      `json:"user"`
+	UserId     int64     `json:"user_id,omitempty"`
 	VideoId    int64     `json:"video_id,omitempty"`
 	Content    string    `json:"content,omitempty"`
 	CreateDate string    `json:"create_date,omitempty"`
