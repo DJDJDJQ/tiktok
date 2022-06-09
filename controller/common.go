@@ -1,7 +1,5 @@
 package controller
 
-import "time"
-
 type Response struct {
 	StatusCode int32  `json:"status_code"`
 	StatusMsg  string `json:"status_msg,omitempty"`
@@ -24,10 +22,10 @@ type Res_Video struct {
 }
 
 type Res_Comment struct {
-	Id         int64     `json:"id"`
-	User       Res_User  `json:"user"`
-	Content    string    `json:"content"`
-	CreateDate time.Time `json:"create_date"`
+	Id         int64    `json:"id"`
+	User       Res_User `json:"user"`
+	Content    string   `json:"content"`
+	CreateDate string   `json:"create_date"`
 }
 
 type Res_User struct {
