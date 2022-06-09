@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -137,20 +136,38 @@ func Login(c *gin.Context) {
 	}
 
 	//处理密码，加密后与数据库中的储存相比较
-	//password_new := string(utils.base64Encode([]byte(password)))
-	password_new := password
-
-	//是否存在用户
+	//password_new := string(base64Encode([]byte(password)))
 	var user model.User
-	res := model.Mysql.Find(&user, "name = ? AND password = ?", username, password_new)
-	fmt.Println(res)
+	res := model.Mysql.Where(" name = ?", username).Find(&user)
+	//如果用户名不存在
 	if res.RowsAffected == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": 1,
-			"status_msg":  "用户名或密码错误",
+			"status_msg":  "用户名不存在",
 		})
 		return
 	}
+	Match_res := utils.StrMatch(user.Password, password, username)
+	//	check := StrEncrypt(password, string(user.Id))
+	if !Match_res {
+		c.JSON(http.StatusOK, gin.H{
+			"status_code": 1,
+			"status_msg":  "密码错误",
+			//			"check":       check,
+		})
+		return
+	}
+	//是否存在用户
+	//var user model.User
+	//res := model.Mysql.Find(&user, "name = ? AND password = ?", username, password_new)
+	//fmt.Println(res)
+	//if res.RowsAffected == 0 {
+	//	c.JSON(http.StatusOK, gin.H{
+	//		"status_code": 1,
+	//		"status_msg":  "用户名或密码错误",
+	//	})
+	//	return
+	//}
 
 	token, err := utils.GenToken(user.Id, user.Name)
 
@@ -168,23 +185,6 @@ func Login(c *gin.Context) {
 		"user_id":     user.Id,
 		"token":       token,
 	})
-
-	// username := c.Query("username")
-	// password := c.Query("password")
-
-	// token := username + password
-
-	// if user, exist := usersLoginInfo[token]; exist {
-	// 	c.JSON(http.StatusOK, UserLoginResponse{
-	// 		Response: Response{StatusCode: 0},
-	// 		UserId:   user.Id,
-	// 		Token:    token,
-	// 	})
-	// } else {
-	// 	c.JSON(http.StatusOK, UserLoginResponse{
-	// 		Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
-	// 	})
-	// }
 }
 
 func UserInfo(c *gin.Context) {
