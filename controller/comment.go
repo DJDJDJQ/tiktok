@@ -18,12 +18,12 @@ type CommentListResponse struct {
 
 // CommentAction no practical effect, just check if token is valid
 func CommentAction(c *gin.Context) {
-	user_id := c.Query("user_id")           //用户id
-	token := c.Query("token")               //用户鉴权token
-	video_id := c.Query("video_id")         //视频id
-	action_type := c.Query("action_type")   //1-发布评论，2-删除评论
-	comment_text := c.Query("comment_text") //可选，用户填写的评论内容
-	comment_id := c.Query("comment_id")     //可选，要删除的评论id
+	user_id, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)   //用户id
+	token := c.Query("token")                                    //用户鉴权token
+	video_id, _ := strconv.ParseInt(c.Query("video_id"), 10, 64) //视频id
+	action_type := c.Query("action_type")                        //1-发布评论，2-删除评论
+	comment_text := c.Query("comment_text")                      //可选，用户填写的评论内容
+	comment_id := c.Query("comment_id")                          //可选，要删除的评论id
 
 	//token和数据库连接的代码可以复用
 	//判断token
@@ -33,12 +33,12 @@ func CommentAction(c *gin.Context) {
 			StatusMsg:  "token invalid"})
 	}
 	//建立数据库连接
-	username := "root"  //账号
-	password := "123"   //密码
-	host := "127.0.0.1" //数据库地址，可以是Ip或者域名
-	port := 3306        //数据库端口
-	Dbname := "douyin"  //数据库名
-	timeout := "10s"    //连接超时，10秒
+	username := "user_tiktok" //账号
+	password := "123"         //密码
+	host := "150.158.97.105"  //数据库地址，可以是Ip或者域名
+	port := 3306              //数据库端口
+	Dbname := "douyin"        //数据库名
+	timeout := "10s"          //连接超时，10秒
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s",
 		username, password, host, port, Dbname, timeout)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -65,8 +65,8 @@ func CommentAction(c *gin.Context) {
 
 // CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
-	token := c.Query("token")       //用户鉴权token
-	video_id := c.Query("video_id") //视频id
+	token := c.Query("token")                                    //用户鉴权token
+	video_id, _ := strconv.ParseInt(c.Query("video_id"), 10, 64) //视频id
 	//判断token
 	if _, exist := usersLoginInfo[token]; !exist {
 		c.JSON(http.StatusOK, Response{
@@ -74,12 +74,12 @@ func CommentList(c *gin.Context) {
 			StatusMsg:  "token invalid"})
 	}
 	//建立数据库连接
-	username := "root"  //账号
-	password := "123"   //密码
-	host := "127.0.0.1" //数据库地址，可以是Ip或者域名
-	port := 3306        //数据库端口
-	Dbname := "douyin"  //数据库名
-	timeout := "10s"    //连接超时，10秒
+	username := "user_tiktok" //账号
+	password := "123"         //密码
+	host := "150.158.97.105"  //数据库地址，可以是Ip或者域名
+	port := 3306              //数据库端口
+	Dbname := "douyin"        //数据库名
+	timeout := "10s"          //连接超时，10秒
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s",
 		username, password, host, port, Dbname, timeout)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -90,7 +90,7 @@ func CommentList(c *gin.Context) {
 			StatusMsg:  "database err"})
 	}
 	var comment []Res_Comment
-	db.Model(&model.Comment{}).Where("VideoId=?", strconv.ParseInt(video_id, 10, 64)).Find(comment)
+	db.Model(&model.Comment{}).Where("VideoId=?", video_id).Find(comment)
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    Response{StatusCode: 0},
 		CommentList: comment,
