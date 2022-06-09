@@ -13,7 +13,7 @@ type User_Token struct {
 type Res_Video struct {
 	Id            int64    `json:"id"`
 	Author        Res_User `json:"author"`
-	PlayUrl       string   `json:"play_url" json:"play_url"`
+	PlayUrl       string   `json:"play_url"`
 	CoverUrl      string   `json:"cover_url"`
 	FavoriteCount int64    `json:"favorite_count"`
 	CommentCount  int64    `json:"comment_count"`
