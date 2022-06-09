@@ -16,6 +16,11 @@ type VideoListResponse struct {
 	VideoList []Res_Video `json:"video_list"`
 }
 
+type CommentListResponse struct {
+	Response
+	CommentList []Res_Comment `json:"comment_list,omitempty"`
+}
+
 type PublishVideo struct {
 	Token string `json:"token,omitempty"`
 	Data  []byte `json:"data,omitempty"`
