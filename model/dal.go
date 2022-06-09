@@ -43,7 +43,7 @@ type Comment struct {
 	Content    string    `json:"content,omitempty"`
 	CreateDate time.Time `json:"create_date,omitempty"`
 	IsDelete   bool      `json:"is_delete,omitempty"`
-	DeleteTime time.Time `json:"delete_time,omitempty"`
+	// DeleteTime time.Time `json:"delete_time,omitempty"`
 }
 
 type Follow struct {
