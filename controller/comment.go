@@ -1,14 +1,14 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.mod/model"
-	"gorm.io/driver/mysql"
+	"go.mod/pkg"
+	"go.mod/utils"
 	"gorm.io/gorm"
 )
 
@@ -19,33 +19,27 @@ type CommentListResponse struct {
 
 // CommentAction no practical effect, just check if token is valid
 func CommentAction(c *gin.Context) {
-	user_id, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)   //用户id
-	token := c.Query("token")                                    //用户鉴权token
+	token := c.Query("token") //用户鉴权token
+	//判断token
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
+	// 解析token获取user_id
+	parseToken, err := utils.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+	}
+	user_id := parseToken.UserId                                 //用户id
 	video_id, _ := strconv.ParseInt(c.Query("video_id"), 10, 64) //视频id
 	action_type := c.Query("action_type")                        //1-发布评论，2-删除评论
 	comment_text := c.Query("comment_text")                      //可选，用户填写的评论内容
 	comment_id := c.Query("comment_id")                          //可选，要删除的评论id
 
-	//token和数据库连接的代码可以复用
-	//判断token
-	if _, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  "token invalid"})
-	}
-	//建立数据库连接
-	username := "user_tiktok" //账号
-	password := "123"         //密码
-	host := "150.158.97.105"  //数据库地址，可以是Ip或者域名
-	port := 3306              //数据库端口
-	Dbname := "douyin"        //数据库名
-	timeout := "10s"          //连接超时，10秒
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s",
-		username, password, host, port, Dbname, timeout)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	//数据库连接出问题
-	if err != nil {
-		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "database err"})
+	//验证参数合法性
+	if action_type != "1" && action_type != "2" {
+		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
 	}
 	if action_type == "1" { //新建评论
 		comment := model.Comment{
@@ -53,15 +47,17 @@ func CommentAction(c *gin.Context) {
 			UserId:  user_id,
 			VideoId: int64(video_id),
 			Content: comment_text}
-		db.Create(&comment)
+		model.Mysql.Create(&comment)
+		c.JSON(http.StatusOK, pkg.Success)
+		//更新video评论数
+		model.Mysql.Model(&model.Video{}).Where("id = ?", video_id).UpdateColumn("comment_count", gorm.Expr("comment_count + ?", 1))
 
-	} else if action_type == "2" { //删除评论
+	} else { //删除评论
 		var comment model.Comment
-		db.Where("Id=?", comment_id).Delete(&comment)
-	} else { //传入action_type非法
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  "action_type invalid"})
+		model.Mysql.Where("Id=?", comment_id).Delete(&comment)
+		c.JSON(http.StatusOK, pkg.Success)
+		//更新video评论数
+		model.Mysql.Model(&model.Video{}).Where("id = ?", video_id).UpdateColumn("comment_count", gorm.Expr("comment_count - ?", 1))
 	}
 }
 
@@ -70,29 +66,12 @@ func CommentList(c *gin.Context) {
 	token := c.Query("token")                                    //用户鉴权token
 	video_id, _ := strconv.ParseInt(c.Query("video_id"), 10, 64) //视频id
 	//判断token
-	if _, exist := usersLoginInfo[token]; !exist {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  "token invalid"})
-	}
-	//建立数据库连接
-	username := "user_tiktok" //账号
-	password := "123"         //密码
-	host := "150.158.97.105"  //数据库地址，可以是Ip或者域名
-	port := 3306              //数据库端口
-	Dbname := "douyin"        //数据库名
-	timeout := "10s"          //连接超时，10秒
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s",
-		username, password, host, port, Dbname, timeout)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	//数据库连接出问题
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  "database err"})
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 	var comment []Res_Comment
-	db.Model(&model.Comment{}).Where("VideoId=?", video_id).Find(comment)
+	model.Mysql.Model(&model.Comment{}).Where("VideoId=?", video_id).Find(comment)
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    Response{StatusCode: 0},
 		CommentList: comment,

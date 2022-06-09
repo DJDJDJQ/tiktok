@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -55,13 +54,15 @@ func FavoriteAction(c *gin.Context) {
 	actionType := c.Query("action_type")
 	if videoId == "" {
 		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
 	} else if actionType != "1" && actionType != "2" {
 		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
 	}
 
 	var temp model.Favorite
 	res := model.Mysql.Model(&model.Favorite{}).Where("user_id=? and video_id=?", userId, videoId).Find(&temp)
-	fmt.Println(res)
+	// fmt.Println(res)
 	// 判断赞操作action_type
 	if actionType == "1" {
 		if res.RowsAffected == 0 {
