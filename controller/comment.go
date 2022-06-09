@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.mod/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -48,7 +49,8 @@ func CommentAction(c *gin.Context) {
 	}
 	if action_type == "1" { //新建评论
 		comment := model.Comment{
-			User:    model.User{Id: int64(user_id)},
+			Id:      int64(uuid.New().ID()),
+			UserId:  user_id,
 			VideoId: int64(video_id),
 			Content: comment_text}
 		db.Create(&comment)
