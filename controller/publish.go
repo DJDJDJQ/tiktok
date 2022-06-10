@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.mod/model"
 	"go.mod/pkg"
 	"go.mod/utils"
@@ -56,6 +58,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
+	title := c.PostForm("title")
 	data, err := c.FormFile("data")
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
@@ -65,6 +68,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
+	// 上传视频，获取视频play_url
 	filename := filepath.Base(data.Filename)
 	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
 	saveFile := filepath.Join("./public/", finalName)
@@ -75,44 +79,38 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
+	play_url := "http://" + pkg.Host + ":8080/?url=" + finalName
+	//play_url := "http://" + host + ":8080/?url=" + finalName
+
+	// TODO 截取封面，获取cover_url
+
+	// snapShotName, err := service.GetSnapshot(finalName, finalName, 1)
+	// if err != nil {
+	// 	c.JSON(http.StatusOK, Response{StatusCode: 7002, StatusMsg: "视频封面截取失败"})
+	// }
+	// cover_url := "http://" + host + ":8080/?url=" + snapShotName
+	cover_url := "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg"
+
+	// 添加video
+	var video model.Video = model.Video{
+		Id:          int64(uuid.New().ID()),
+		UserId:      parseToken.UserId,
+		PlayUrl:     play_url,
+		CoverUrl:    cover_url,
+		Title:       title,
+		PublishTime: time.Now(),
+		Status:      0,
+	}
+	res := model.Mysql.Model(&model.Video{}).Create(&video)
+	if res.RowsAffected == 0 {
+		c.JSON(http.StatusOK, pkg.ServiceErr)
+		return
+	}
 
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
 	})
-
-	// token := c.PostForm("token")
-
-	// if _, exist := usersLoginInfo[token]; !exist {
-	// 	c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
-	// 	return
-	// }
-
-	// data, err := c.FormFile("data")
-	// if err != nil {
-	// 	c.JSON(http.StatusOK, Response{
-	// 		StatusCode: 1,
-	// 		StatusMsg:  err.Error(),
-	// 	})
-	// 	return
-	// }
-
-	// filename := filepath.Base(data.Filename)
-	// user := usersLoginInfo[token]
-	// finalName := fmt.Sprintf("%d_%s", user.Id, filename)
-	// saveFile := filepath.Join("./public/", finalName)
-	// if err := c.SaveUploadedFile(data, saveFile); err != nil {
-	// 	c.JSON(http.StatusOK, Response{
-	// 		StatusCode: 1,
-	// 		StatusMsg:  err.Error(),
-	// 	})
-	// 	return
-	// }
-
-	// c.JSON(http.StatusOK, Response{
-	// 	StatusCode: 0,
-	// 	StatusMsg:  finalName + " uploaded successfully",
-	// })
 }
 
 // PublishList all users have same publish video list
@@ -122,11 +120,13 @@ func PublishList(c *gin.Context) {
 	// 验证参数有效性
 	if token == "" {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 	// // 解析token获取user_id
 	claims, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 
 	// 查找user_id发布的视频

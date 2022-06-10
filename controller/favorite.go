@@ -45,6 +45,7 @@ func FavoriteAction(c *gin.Context) {
 	parseToken, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 	userId := parseToken.UserId
 
