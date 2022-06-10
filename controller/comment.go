@@ -111,10 +111,34 @@ func CommentList(c *gin.Context) {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
 		return
 	}
-	var comment []Res_Comment
-	model.Mysql.Model(&model.Comment{}).Where("VideoId=?", video_id).Find(comment)
+	var video model.Video
+	resSearch := model.Mysql.Model(&model.Video{}).Where("VideoId=?", video_id).First(&video)
+	if resSearch.RowsAffected != 1 { //未找到视频
+		c.JSON(http.StatusOK, pkg.RecordNotExistErrCode)
+		return
+	} //搜索到视频
+	var comment_list []model.Comment  //评论
+	var rescomment_list []Res_Comment //返回的评论列表
+	model.Mysql.Model(&model.Comment{}).Where("VideoId=?", video_id).Find(&comment_list)
+	//model.Comment To Res_Comment
+	for _, comment_temp := range comment_list {
+		var commenter Res_User //该评论的用户信息
+		resSearchUser := model.Mysql.Model(&model.User{}).Where("Id=?", comment_temp.UserId).First(&commenter)
+		if resSearchUser.RowsAffected != 1 {
+			c.JSON(http.StatusOK, pkg.RecordNotExistErrCode)
+			return
+		}
+		rescomment_list = append(rescomment_list,
+			Res_Comment{
+				Id:         comment_temp.Id,
+				User:       commenter,
+				Content:    comment_temp.Content,
+				CreateDate: comment_temp.CreateDate.Format("01-02"),
+			})
+	}
 	c.JSON(http.StatusOK, CommentListResponse{
 		Response:    Response{StatusCode: 0},
-		CommentList: comment,
+		CommentList: rescomment_list,
 	})
+
 }
