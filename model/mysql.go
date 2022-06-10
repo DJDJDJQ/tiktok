@@ -10,8 +10,9 @@ var Mysql *gorm.DB
 
 func init() {
 	var err error
-	//dsn := "root:leelee@tcp(127.0.0.1:3306)/douyin?charset=utf8mb4&parseTime=true&loc=Local"
-	dsn := "user_tiktok:123@tcp(150.158.97.105:3306)/douyin?charset=utf8&parseTime=true&loc=Local"
+	//dsn := "root:leelee@tcp(127.0.0.1:3306)/douyin?charset=utf8mb4&parseTime=true&loc=Local"       //本地运行测试用
+	//dsn := "user_tiktok:123@tcp(127.0.0.1:3306)/douyin?charset=utf8&parseTime=true&loc=Local"      //服务器运行及测试测试用
+	dsn := "user_tiktok:123@tcp(150.158.97.105:3306)/douyin?charset=utf8&parseTime=true&loc=Local" //本地运行服务器测试用
 
 	logrus.Info("初始化数据库···")
 
