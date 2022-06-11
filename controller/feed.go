@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,24 +23,30 @@ func Feed(c *gin.Context) {
 	// 	NextTime:  time.Now().Unix(),
 	// })
 	token := c.Query("token")
-	latest_time, err := strconv.Atoi(c.Query("latest_time"))
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  "Timestamp parsing error",
-		})
-		return
+	latest_time := c.Query("latest_time")
+	timeobj, _ := time.Parse("2006-01-02 15:04:05", latest_time)
+	if timeobj.IsZero() || time.Since(timeobj) < 0 {
+		// 说明传入时间为空或者传入时间大于当前时间，那么赋值为当前时间
+		timeobj = time.Now()
 	}
+	/*	latest_time, err := strconv.Atoi(c.Query("latest_time"))
+		if err != nil {
+			c.JSON(http.StatusOK, Response{
+				StatusCode: 1,
+				StatusMsg:  "Timestamp parsing error",
+			})
+			return
+		}
 
-	var timeobj time.Time
+	var timeobj time.Time*/
 	var nexttime int64 //本次返回的视频中发布最早的时间，作为下次请求的latest_time
 	Videos := []model.Video{}
 
-	if latest_time != 0 { //可选参数，不填默认当前时间
-		timeobj = time.Unix(int64(latest_time), 0)
-	} else {
-		timeobj = time.Now()
-	}
+	/*	if latest_time != 0 { //可选参数，不填默认当前时间
+			timeobj = time.Unix(int64(latest_time), 0)
+		} else {
+			timeobj = time.Now()
+		}*/
 
 	model.Mysql.Table("tb_video").Limit(30).Where("publish_time < ?", timeobj).Order("publish_time desc").Find(&Videos)
 

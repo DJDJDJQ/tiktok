@@ -126,10 +126,10 @@ func FavoriteList(c *gin.Context) {
 		for _, video := range video_list {
 			// 查找视频作者
 			// 改动
-			follow := model.Follow{}
+			// follow := model.Follow{}
 			isfollow := true
 			if claims.UserId != utils.Str2int64(user_id) {
-				res := model.Mysql.Table("tb_follow").Where("user_id = ? and follow_id = ?", claims.UserId, user_id).Find(&follow)
+				res := model.Mysql.Table("tb_follow").Where("user_id = ? and follow_id = ?", claims.UserId, user_id).Find(&model.Follow{})
 				if res.RowsAffected == 0 {
 					isfollow = false
 				}
