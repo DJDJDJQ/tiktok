@@ -105,8 +105,11 @@ func CommentAction(c *gin.Context) {
 func CommentList(c *gin.Context) {
 	token := c.Query("token")                        //用户鉴权token
 	video_id := utils.Str2int64(c.Query("video_id")) //视频id
-	//判断token
-	println(token)
+	//解析token
+	userLogin, err := utils.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+	}
 	//不需要登录也可以查看评论
 
 	// if token == "" {
@@ -122,20 +125,35 @@ func CommentList(c *gin.Context) {
 	//搜索到视频
 	var comment_list []model.Comment  //评论
 	var rescomment_list []Res_Comment //返回的评论列表
-	model.Mysql.Model(&model.Comment{}).Where("video_id=?", video_id).Find(&comment_list)
-
+	model.Mysql.Model(&model.Comment{}).Where("video_id=?", video_id).Find(&comment_list).Order("CreateDate desc")
+	//TODO 评论时间顺序
 	//model.Comment To Res_Comment
 	for _, comment_temp := range comment_list {
-		var commenter Res_User //该评论的用户信息
+		var commenter model.User //该评论的用户信息
 		resSearchUser := model.Mysql.Model(&model.User{}).Where("id=?", comment_temp.UserId).First(&commenter)
 		if resSearchUser.RowsAffected != 1 {
 			c.JSON(http.StatusOK, pkg.RecordNotExistErrCode)
 			return
 		}
+		//判断是否关注评论者
+		isfollow := true
+		if userLogin.UserId != commenter.Id {
+			res := model.Mysql.Table("tb_follow").Where("user_id = ? and follow_id = ?", userLogin.UserId, commenter.Id).Find(&model.Follow{})
+			if res.RowsAffected == 0 {
+				isfollow = false
+			}
+		}
+
 		rescomment_list = append(rescomment_list,
 			Res_Comment{
-				Id:         comment_temp.Id,
-				User:       commenter,
+				Id: comment_temp.Id,
+				User: Res_User{
+					Id:            commenter.Id,
+					Name:          commenter.Name,
+					FollowCount:   commenter.FollowCount,
+					FollowerCount: commenter.FollowerCount,
+					IsFollow:      isfollow,
+				},
 				Content:    comment_temp.Content,
 				CreateDate: comment_temp.CreateDate.Format("01-02"),
 			})
