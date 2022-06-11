@@ -95,10 +95,10 @@ func FileStream(c *gin.Context) {
 
 	//打开文件
 	fileTmp, errByOpenFile := os.Open(filePath)
-	defer fileTmp.Close()
 	if errByOpenFile != nil {
 		c.JSON(http.StatusOK, http.Response{StatusCode: 7001, Status: "获取文件失败"})
 	}
+	defer fileTmp.Close()
 
 	//获取文件的名称
 	//fileName:=path.Base(filePath)
@@ -108,7 +108,6 @@ func FileStream(c *gin.Context) {
 	// c.Header("Content-Transfer-Encoding", "binary")
 	//c.Header("Content-Type", contentType)
 	c.File(filePath)
-	return
 }
 
 func GetContentType(fileName string) (extension, contentType string) {
