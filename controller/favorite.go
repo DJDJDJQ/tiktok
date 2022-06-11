@@ -71,7 +71,6 @@ func FavoriteAction(c *gin.Context) {
 				UserId:     userId,
 				VideoId:    utils.Str2int64(videoId),
 				CreateTime: time.Now(),
-				IsCancel:   false,
 			}
 			resCreate := model.Mysql.Create(&favorite)
 			if resCreate.RowsAffected != 1 {

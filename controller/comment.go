@@ -73,7 +73,6 @@ func CommentAction(c *gin.Context) {
 						Name:          user_temp.Name,
 						FollowCount:   user_temp.FollowCount,
 						FollowerCount: user_temp.FollowerCount,
-						IsFollow:      user_temp.IsFollow,
 					},
 					Content:    comment_text,
 					CreateDate: CommitTimeNew.Format("01-02"),
