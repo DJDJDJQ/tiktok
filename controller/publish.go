@@ -80,7 +80,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 	play_url := "http://" + pkg.Host + ":8080/?url=" + finalName
-	//play_url := "http://" + host + ":8080/?url=" + finalName
+	//play_url := "http://" + pkg.LocalHost + ":8080/?url=" + finalName
 
 	// TODO 截取封面，获取cover_url
 

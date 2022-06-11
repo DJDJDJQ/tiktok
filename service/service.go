@@ -85,27 +85,14 @@ var HttpContentType = map[string]string{
 }
 
 func FileStream(c *gin.Context) {
-	// fileName := c.Query("url")
-	// //获取文件名称带后缀
-	// fileNameWithSuffix := path.Base(fileName)
-	// //获取文件的后缀
-	// fileType := path.Ext(fileNameWithSuffix)
-	// //获取文件类型对应的http ContentType 类型
-	// fileContentType := HttpContentType[fileType]
-	// // if common.IsEmpty(fileContentType) {
-	// // 	c.String(http.StatusNotFound, "file http contentType not found")
-	// // 	return
-	// // }
-	// filePath := filepath.Join("./public/", fileName)
-	// c.Header("Content-Type", fileContentType)
-	// c.File(filePath)
-
 	fileName := c.Query("url")
-	//filePath := filepath.Join("./public/", fileName)
 
+	//_, contentType := GetContentType(fileName)
+
+	//filePath := filepath.Join("./public/", fileName)
 	// ！！！这里改成服务器存放视频的路径
-	filePath := "D:\\学习\\Go\\字节后端\\抖音项目\\douyin\\public\\" + fileName
-	fmt.Println(filePath)
+	filePath := "D:\\学习\\Go\\字节后端\\抖音项目\\titok\\public\\" + fileName
+
 	//打开文件
 	fileTmp, errByOpenFile := os.Open(filePath)
 	defer fileTmp.Close()
@@ -119,7 +106,7 @@ func FileStream(c *gin.Context) {
 	//c.Header("Content-Disposition", "attachment; filename="+fileName)
 	// c.Header("Cache-Control", "no-cache")
 	// c.Header("Content-Transfer-Encoding", "binary")
-
+	//c.Header("Content-Type", contentType)
 	c.File(filePath)
 	return
 }

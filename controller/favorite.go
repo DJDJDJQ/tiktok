@@ -119,7 +119,7 @@ func FavoriteList(c *gin.Context) {
 
 	var videoId_list []int64
 	var rsp_video_list []Res_Video
-	model.Mysql.Model(&model.Favorite{}).Select("video_id").Where("user_id=? and is_cancel=0", user_id).Find(&videoId_list)
+	model.Mysql.Model(&model.Favorite{}).Select("video_id").Where("user_id=?", user_id).Find(&videoId_list)
 	if len(videoId_list) != 0 {
 		var video_list []model.Video
 		model.Mysql.Model(&model.Video{}).Where("id in (?)", videoId_list).Find(&video_list)
