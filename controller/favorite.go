@@ -63,7 +63,6 @@ func FavoriteAction(c *gin.Context) {
 
 	var temp model.Favorite
 	res := model.Mysql.Model(&model.Favorite{}).Where("user_id=? and video_id=?", userId, videoId).Find(&temp)
-	// fmt.Println(res)
 	// 判断赞操作action_type
 	if actionType == "1" {
 		if res.RowsAffected == 0 {
@@ -72,10 +71,13 @@ func FavoriteAction(c *gin.Context) {
 				UserId:     userId,
 				VideoId:    utils.Str2int64(videoId),
 				CreateTime: time.Now(),
-				IsCancel:   false,
 			}
-			model.Mysql.Create(&favorite)
-
+			resCreate := model.Mysql.Create(&favorite)
+			if resCreate.RowsAffected != 1 {
+				//特殊情况导致插入失败
+				c.JSON(http.StatusOK, pkg.ServiceErrCode)
+				return
+			}
 			// 更新video点赞数
 			model.Mysql.Model(&model.Video{}).Where("id = ?", videoId).UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1))
 
@@ -87,8 +89,12 @@ func FavoriteAction(c *gin.Context) {
 		if res.RowsAffected == 0 {
 			c.JSON(http.StatusOK, pkg.RecordNotExistErr)
 		} else {
-			model.Mysql.Delete(&temp)
-
+			resDelete := model.Mysql.Delete(&temp)
+			if resDelete.RowsAffected != 1 {
+				//特殊情况导致删除失败
+				c.JSON(http.StatusOK, pkg.ServiceErrCode)
+				return
+			}
 			// 更新video点赞数
 			model.Mysql.Model(&model.Video{}).Where("id = ?", videoId).UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1))
 
