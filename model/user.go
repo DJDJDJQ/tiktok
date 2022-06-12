@@ -13,7 +13,7 @@ func UpdataUserFollowCount(userId int64, cnt int) {
 		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("follow_count", gorm.Expr("follow_count + ?", cnt))
 
 	} else if cnt < 0 {
-		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("follow_count", gorm.Expr("follow_count - ?", cnt))
+		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("follow_count", gorm.Expr("follow_count - ?", 0-cnt))
 	}
 	return
 }
@@ -23,7 +23,7 @@ func UpdataUserFollowerCount(userId int64, cnt int) {
 		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("follower_count", gorm.Expr("follower_count + ?", cnt))
 
 	} else if cnt < 0 {
-		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("follower_count", gorm.Expr("follower_count - ?", cnt))
+		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("follower_count", gorm.Expr("follower_count - ?", 0-cnt))
 	}
 	return
 }
