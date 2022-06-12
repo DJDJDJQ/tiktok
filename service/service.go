@@ -86,11 +86,6 @@ var HttpContentType = map[string]string{
 
 func FileStream(c *gin.Context) {
 	fileName := c.Query("url")
-
-	//_, contentType := GetContentType(fileName)
-
-	//filePath := filepath.Join("./public/", fileName)
-	// ！！！这里改成服务器存放视频的路径
 	filePath := "D:\\学习\\Go\\字节后端\\抖音项目\\titok\\public\\" + fileName
 
 	//打开文件
@@ -99,14 +94,6 @@ func FileStream(c *gin.Context) {
 		c.JSON(http.StatusOK, http.Response{StatusCode: 7001, Status: "获取文件失败"})
 	}
 	defer fileTmp.Close()
-
-	//获取文件的名称
-	//fileName:=path.Base(filePath)
-	// c.Header("Content-Type", "application/octet-stream")
-	//c.Header("Content-Disposition", "attachment; filename="+fileName)
-	// c.Header("Cache-Control", "no-cache")
-	// c.Header("Content-Transfer-Encoding", "binary")
-	//c.Header("Content-Type", contentType)
 	c.File(filePath)
 }
 
@@ -127,12 +114,6 @@ func GetContentType(fileName string) (extension, contentType string) {
 			contentType = "video/mpeg4"
 		case "mp3":
 			contentType = "audio/mp3"
-		case "wav":
-			contentType = "audio/wav"
-		case "pdf":
-			contentType = "application/pdf"
-		case "doc", "":
-			contentType = "application/msword"
 		}
 	}
 	// .*（ 二进制流，不知道下载文件类型）
@@ -167,18 +148,9 @@ func Download(w http.ResponseWriter, req *http.Request) {
 	}
 
 	_, contentType := GetContentType(filename)
-	// w.Header().Set("Content-Disposition", "attachment; filename="+filename)
-	//w.Header().Set("Content-Type", http.DetectContentType(fileHeader))
 	w.Header().Set("Content-Type", contentType)
 	w.Header().Set("Content-Length", strconv.FormatInt(info.Size(), 10))
 
 	f.Seek(0, 0)
 	io.Copy(w, f)
 }
-
-// func main() {
-// 	fmt.Printf("linsten on :8080 \n")
-// 	http.HandleFunc("/file/upload", Upload)
-// 	http.HandleFunc("/", Download)
-// 	http.ListenAndServe(":8081", nil)
-// }

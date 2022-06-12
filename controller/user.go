@@ -40,29 +40,6 @@ type UserResponse struct {
 }
 
 func Register(c *gin.Context) {
-	// username := c.Query("username")
-	// password := c.Query("password")
-
-	// token := username + password
-
-	// if _, exist := usersLoginInfo[token]; exist {
-	// 	c.JSON(http.StatusOK, UserLoginResponse{
-	// 		Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
-	// 	})
-	// } else {
-	// 	atomic.AddInt64(&userIdSequence, 1)
-	// 	newUser := Res_User{
-	// 		Id:   userIdSequence,
-	// 		Name: username,
-	// 	}
-	// 	usersLoginInfo[token] = newUser
-	// 	c.JSON(http.StatusOK, UserLoginResponse{
-	// 		Response: Response{StatusCode: 0},
-	// 		UserId:   userIdSequence,
-	// 		Token:    username + password,
-	// 	})
-	// }
-
 	username := c.Query("username")
 	password := c.Query("password")
 
@@ -96,7 +73,6 @@ func Register(c *gin.Context) {
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-
 		newUser := model.User{
 			Id:           int64(uuid.New().ID()),
 			Name:         username,
@@ -113,7 +89,6 @@ func Register(c *gin.Context) {
 		}
 
 		model.Mysql.Table("tb_user").Save(&newUser)
-		//未处理Error 1406: Data too long for column 'password' at row 1
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "success"},
 			UserId:   newUser.Id,
@@ -125,8 +100,7 @@ func Register(c *gin.Context) {
 func Login(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
-
-	//验证是否输入
+	//验证是否输入为空
 	if username == "" || password == "" {
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": 2,
@@ -136,7 +110,6 @@ func Login(c *gin.Context) {
 	}
 
 	//处理密码，加密后与数据库中的储存相比较
-	//password_new := string(base64Encode([]byte(password)))
 	var user model.User
 	res := model.Mysql.Where(" name = ?", username).Find(&user)
 	//如果用户名不存在
@@ -148,29 +121,16 @@ func Login(c *gin.Context) {
 		return
 	}
 	Match_res := utils.StrMatch(user.Password, password, username)
-	//	check := StrEncrypt(password, string(user.Id))
 	if !Match_res {
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": 1,
 			"status_msg":  "密码错误",
-			//			"check":       check,
 		})
 		return
 	}
-	//是否存在用户
-	//var user model.User
-	//res := model.Mysql.Find(&user, "name = ? AND password = ?", username, password_new)
-	//fmt.Println(res)
-	//if res.RowsAffected == 0 {
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"status_code": 1,
-	//		"status_msg":  "用户名或密码错误",
-	//	})
-	//	return
-	//}
 
+	// 获取token
 	token, err := utils.GenToken(user.Id, user.Name)
-
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": 1,
@@ -198,7 +158,6 @@ func UserInfo(c *gin.Context) {
 
 	var user model.User
 	result := model.Mysql.Where(" id = ?", userId).Find(&user)
-
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": 2,
@@ -212,17 +171,4 @@ func UserInfo(c *gin.Context) {
 			"user":        user,
 		})
 	}
-
-	// token := c.Query("token")
-
-	// if user, exist := usersLoginInfo[token]; exist {
-	// 	c.JSON(http.StatusOK, UserResponse{
-	// 		Response: Response{StatusCode: 0},
-	// 		User:     user,
-	// 	})
-	// } else {
-	// 	c.JSON(http.StatusOK, UserResponse{
-	// 		Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
-	// 	})
-	// }
 }

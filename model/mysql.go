@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -18,12 +20,12 @@ func init() {
 
 	Mysql, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		fmt.Println("数据库连接错误，请检查参数", err)
 	}
 
-	//err = Mysql.AutoMigrate(User{}, Comment{}, Like{}, Video{})
-	//if err != nil {
-	//	logrus.Errorln("表生成出错", err)
-	//	return
-	//}
+	// err = Mysql.AutoMigrate(User{}, Comment{}, Favorite{}, Video{}, Follow{})
+	// if err != nil {
+	// 	logrus.Errorln("表生成出错", err)
+	// 	return
+	// }
 }

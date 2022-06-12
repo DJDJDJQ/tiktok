@@ -17,11 +17,6 @@ type FeedResponse struct {
 
 // Feed same demo video list for every request
 func Feed(c *gin.Context) {
-	// c.JSON(http.StatusOK, FeedResponse{
-	// 	Response:  Response{StatusCode: 0},
-	// 	VideoList: DemoVideos,
-	// 	NextTime:  time.Now().Unix(),
-	// })
 	token := c.Query("token")
 	latest_time := c.Query("latest_time")
 	timeobj, _ := time.Parse("2006-01-02 15:04:05", latest_time)
@@ -29,24 +24,8 @@ func Feed(c *gin.Context) {
 		// 说明传入时间为空或者传入时间大于当前时间，那么赋值为当前时间
 		timeobj = time.Now()
 	}
-	/*	latest_time, err := strconv.Atoi(c.Query("latest_time"))
-		if err != nil {
-			c.JSON(http.StatusOK, Response{
-				StatusCode: 1,
-				StatusMsg:  "Timestamp parsing error",
-			})
-			return
-		}
-
-	var timeobj time.Time*/
 	var nexttime int64 //本次返回的视频中发布最早的时间，作为下次请求的latest_time
 	Videos := []model.Video{}
-
-	/*	if latest_time != 0 { //可选参数，不填默认当前时间
-			timeobj = time.Unix(int64(latest_time), 0)
-		} else {
-			timeobj = time.Now()
-		}*/
 
 	model.Mysql.Table("tb_video").Limit(30).Where("publish_time < ?", timeobj).Order("publish_time desc").Find(&Videos)
 
@@ -68,7 +47,6 @@ func Feed(c *gin.Context) {
 				FollowCount:   author.FollowCount,
 				FollowerCount: author.FollowerCount,
 				IsFollow:      false,
-				//IsFollow:      author.IsFollow,
 			}
 
 			temp := Res_Video{
@@ -87,16 +65,7 @@ func Feed(c *gin.Context) {
 		claims, _ := utils.ParseToken(token)
 		for _, value := range Videos {
 			author := model.User{}
-			// 改动
-			follow := model.Follow{}
-			isfollow := true
-			if claims.UserId != value.UserId {
-				res := model.Mysql.Table("tb_follow").Where("user_id = ? and follow_id = ?", claims.UserId, value.UserId).Find(&follow)
-				if res.RowsAffected == 0 {
-					isfollow = false
-				}
-			}
-			//
+			isfollow := model.SearchIsFollow(claims.UserId, value.UserId)
 			model.Mysql.Table("tb_user").Where("id = ?", value.UserId).Find(&author)
 			res_author := Res_User{
 				Id:            author.Id,
@@ -105,12 +74,8 @@ func Feed(c *gin.Context) {
 				FollowerCount: author.FollowerCount,
 				IsFollow:      isfollow, //
 			}
-			favorite := model.Favorite{}
-			isfavor := false
-			res := model.Mysql.Table("tb_favorite").Where("user_id = ? AND video_id = ?", claims.UserId, value.Id).Find(&favorite)
-			if res.RowsAffected != 0 {
-				isfavor = true
-			}
+
+			isfavor := model.SearchIsFavorite(claims.UserId, value.Id)
 			temp := Res_Video{
 				Id:            value.Id,
 				Author:        res_author,

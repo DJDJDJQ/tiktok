@@ -13,6 +13,7 @@ const (
 	LoginErrCode              = 10004
 	RecordNotExistErrCode     = 10005
 	RecordAlreadyExistErrCode = 10006
+	DataBaseErrCode           = 10007
 )
 
 type ErrNo struct {
@@ -41,6 +42,7 @@ var (
 	LoginErr              = NewErrNo(LoginErrCode, "Wrong username or password")
 	RecordNotExistErr     = NewErrNo(RecordNotExistErrCode, "The record does not exists")
 	RecordAlreadyExistErr = NewErrNo(RecordAlreadyExistErrCode, "The record already exists")
+	DataBaseErr           = NewErrNo(DataBaseErrCode, "Database Error")
 )
 
 // ConvertErr convert error to Errno
