@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -59,7 +57,10 @@ func Publish(c *gin.Context) {
 	}
 
 	title := c.PostForm("title")
-	data, err := c.FormFile("data")
+
+	// 上传视频，获取视频play_url
+
+	play_url, err := stroage_upload(user.Id, c)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
@@ -67,22 +68,8 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
-
-	// 上传视频，获取视频play_url
-	filename := filepath.Base(data.Filename)
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
-	saveFile := filepath.Join("./public/", finalName)
-	if err := c.SaveUploadedFile(data, saveFile); err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
-	play_url := "http://" + pkg.Host + ":8080/?url=" + finalName
-	//play_url := "http://" + pkg.LocalHost + ":8080/?url=" + finalName
-
-	// TODO 截取封面，获取cover_url
+	// //存储在本地
+	// TODO 截取封面，获取cover_url 目前是写死的
 
 	// snapShotName, err := service.GetSnapshot(finalName, finalName, 1)
 	// if err != nil {
@@ -109,7 +96,7 @@ func Publish(c *gin.Context) {
 
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
-		StatusMsg:  finalName + " uploaded successfully",
+		StatusMsg:  "uploaded successfully",
 	})
 }
 

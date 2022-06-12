@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"go.mod/controller"
-	"go.mod/service"
 )
 
 func initRouter(r *gin.Engine) {
@@ -32,6 +31,6 @@ func initRouter(r *gin.Engine) {
 	apiRouter.GET("/relation/follower/list/", controller.FollowerList)
 
 	// http
-	httpRouter := r
-	httpRouter.GET("/", service.FileStream)
+	// httpRouter := r
+	// httpRouter.GET("/", service.FileStream)
 }
