@@ -33,4 +33,7 @@ func initRouter(r *gin.Engine) {
 	// http
 	// httpRouter := r
 	// httpRouter.GET("/", service.FileStream)
+
+	// 获取截图回调函数
+	// apiRouter.POST("/callback/", controller.Stroage_uploadCover)
 }

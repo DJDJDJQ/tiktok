@@ -60,7 +60,7 @@ func Publish(c *gin.Context) {
 
 	// 上传视频，获取视频play_url
 
-	play_url, err := stroage_upload(user.Id, c)
+	play_url, cover_url, err := stroage_upload(user.Id, c)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
@@ -71,12 +71,13 @@ func Publish(c *gin.Context) {
 	// //存储在本地
 	// TODO 截取封面，获取cover_url 目前是写死的
 
+	// 视频封面写死
 	// snapShotName, err := service.GetSnapshot(finalName, finalName, 1)
 	// if err != nil {
 	// 	c.JSON(http.StatusOK, Response{StatusCode: 7002, StatusMsg: "视频封面截取失败"})
 	// }
 	// cover_url := "http://" + host + ":8080/?url=" + snapShotName
-	cover_url := "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg"
+	// cover_url := "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg"
 
 	// 添加video
 	var video model.Video = model.Video{
