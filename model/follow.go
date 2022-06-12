@@ -33,7 +33,7 @@ func DeleteFollow(temp Follow) int {
 func SearchIsFollow(userId int64, followId int64) bool {
 	isfollow := true
 	if userId != followId {
-		res := Mysql.Table("tb_follow").Where("user_id = ? and follow_id = ?", userId, followId).Find(Follow{})
+		res := Mysql.Table("tb_follow").Where("user_id = ? and follow_id = ?", userId, followId).Find(&Follow{})
 		if res.RowsAffected == 0 {
 			isfollow = false
 		}
