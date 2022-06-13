@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mod/model"
 	"go.mod/pkg"
+	"go.mod/service"
 	"go.mod/utils"
 )
 
@@ -51,7 +52,7 @@ func Publish(c *gin.Context) {
 	title := c.PostForm("title")
 
 	// 上传视频，获取视频play_url
-	play_url, cover_url, err := stroage_upload(user.Id, c)
+	play_url, cover_url, err := service.Stroage_upload(user.Id, c)
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
