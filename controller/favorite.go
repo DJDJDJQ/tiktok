@@ -25,6 +25,10 @@ type favorite_action_request struct {
 // FavoriteAction no practical effect, just check if token is valid
 func FavoriteAction(c *gin.Context) {
 	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
 	// 解析token获取user_id
 	parseToken, err := utils.ParseToken(token)
 	if err != nil {
@@ -83,6 +87,10 @@ func FavoriteAction(c *gin.Context) {
 func FavoriteList(c *gin.Context) {
 	user_id := c.Query("user_id")
 	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
 	// 验证token有效性
 	if token == "" {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)

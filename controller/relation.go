@@ -18,6 +18,10 @@ type UserListResponse struct {
 // RelationAction no practical effect, just check if token is valid
 func RelationAction(c *gin.Context) {
 	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
 	// 解析token获取user_id
 	parseToken, err := utils.ParseToken(token)
 	if err != nil {
@@ -56,6 +60,10 @@ func RelationAction(c *gin.Context) {
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
 	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
 	// // 解析token获取user_id
 	claims, err := utils.ParseToken(token)
 	if err != nil {
@@ -91,6 +99,10 @@ func FollowList(c *gin.Context) {
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
 	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
 	// 解析token获取user_id
 	claims, err := utils.ParseToken(token)
 	if err != nil {

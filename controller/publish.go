@@ -38,6 +38,7 @@ func Publish(c *gin.Context) {
 	parseToken, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 	userId := parseToken.UserId
 
@@ -88,6 +89,10 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 	user_id := c.Query("user_id")
 	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
+	}
 	// 解析token获取user_id
 	claims, err := utils.ParseToken(token)
 	if err != nil {

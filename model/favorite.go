@@ -36,7 +36,7 @@ func DeleteFavorite(temp Favorite) int {
 	UpdateFavoriteCount(temp.UserId, -1)
 	var authorId int64
 	Mysql.Model(&Video{}).Select("user_id").Where("id = ?", temp.VideoId).Find(&authorId)
-	UpdateTotalFavoritedCount(authorId, 1)
+	UpdateTotalFavoritedCount(authorId, -1)
 	return 0
 }
 

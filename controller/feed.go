@@ -42,11 +42,13 @@ func Feed(c *gin.Context) {
 			author := model.User{}
 			model.Mysql.Table("tb_user").Where("id = ?", value.UserId).Find(&author)
 			res_author := Res_User{
-				Id:            author.Id,
-				Name:          author.Name,
-				FollowCount:   author.FollowCount,
-				FollowerCount: author.FollowerCount,
-				IsFollow:      false,
+				Id:             author.Id,
+				Name:           author.Name,
+				FollowCount:    author.FollowCount,
+				FollowerCount:  author.FollowerCount,
+				IsFollow:       false,
+				TotalFavorited: author.TotalFavorited,
+				FavoriteCount:  author.FavoriteCount,
 			}
 
 			temp := Res_Video{
@@ -68,11 +70,13 @@ func Feed(c *gin.Context) {
 			isfollow := model.SearchIsFollow(claims.UserId, value.UserId)
 			model.Mysql.Table("tb_user").Where("id = ?", value.UserId).Find(&author)
 			res_author := Res_User{
-				Id:            author.Id,
-				Name:          author.Name,
-				FollowCount:   author.FollowCount,
-				FollowerCount: author.FollowerCount,
-				IsFollow:      isfollow, //
+				Id:             author.Id,
+				Name:           author.Name,
+				FollowCount:    author.FollowCount,
+				FollowerCount:  author.FollowerCount,
+				IsFollow:       isfollow,
+				TotalFavorited: author.TotalFavorited,
+				FavoriteCount:  author.FavoriteCount,
 			}
 
 			isfavor := model.SearchIsFavorite(claims.UserId, value.Id)

@@ -122,7 +122,7 @@ func CommentList(c *gin.Context) {
 	//搜索到视频
 	var comment_list []model.Comment  //评论
 	var rescomment_list []Res_Comment //返回的评论列表
-	model.Mysql.Model(&model.Comment{}).Where("video_id=?", video_id).Find(&comment_list)
+	model.Mysql.Model(&model.Comment{}).Where("video_id=?", video_id).Order("create_date desc").Find(&comment_list)
 
 	//model.Comment To Res_Comment
 	for _, comment_temp := range comment_list {
