@@ -1,15 +1,15 @@
 # tiktok
 
-### 项目介绍
+## 项目介绍
 
 抖声（抖音极速版）后端接口实现
 
-### 功能说明
+## 功能说明
 
 具体功能说明请参考飞书接口文档
 https://bytedance.feishu.cn/docx/doxcnbgkMy2J0Y3E6ihqrvtHXPg
 
-### 主要技术栈
+## 主要技术栈
 
 - Gin
 - Gorm
@@ -17,13 +17,13 @@ https://bytedance.feishu.cn/docx/doxcnbgkMy2J0Y3E6ihqrvtHXPg
 - 腾讯云对象存储COS
 - JWT
 
-### 项目环境
+## 项目环境
 
 - Go 1.18
 - MySQL 5.7
 - Gorm 2.x
 
-### 文件目录
+## 文件目录
 
 ~~~
 ├── controller （向客户端提供的api接口层)
@@ -34,7 +34,6 @@ https://bytedance.feishu.cn/docx/doxcnbgkMy2J0Y3E6ihqrvtHXPg
 │   ├── feed.go
 │   ├── publish.go
 │   ├── relation.go
-│   ├── stroage.go
 │   └── user.go
 ├── docs （项目工作文档）
 │   ├── Douyin-Database-v6 客户端.sql
@@ -53,7 +52,6 @@ https://bytedance.feishu.cn/docx/doxcnbgkMy2J0Y3E6ihqrvtHXPg
 │   └── user.go
 │   └── video.go
 ├── pkg
-│   ├── constants.go
 │   └── errno.go
 ├── README.md
 ├── router.go
@@ -61,7 +59,8 @@ https://bytedance.feishu.cn/docx/doxcnbgkMy2J0Y3E6ihqrvtHXPg
 │   ├── favorite.go
 │   ├── publish.go
 │   ├── relation.go
-│   └── service.go
+│   ├── service.go
+│   └── stroage.go
 └── utils （工具类）
     ├── encrypt.go
     ├── jwt.go
