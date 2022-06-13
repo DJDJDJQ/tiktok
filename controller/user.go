@@ -165,10 +165,19 @@ func UserInfo(c *gin.Context) {
 		})
 		return
 	} else {
+		var rsp_user Res_User = Res_User{
+			Id:             user.Id,
+			Name:           user.Name,
+			FollowCount:    user.FollowCount,
+			FollowerCount:  user.FollowerCount,
+			IsFollow:       true,
+			TotalFavorited: user.TotalFavorited,
+			FavoriteCount:  user.FavoriteCount,
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"status_code": 0,
 			"status_msg":  "success",
-			"user":        user,
+			"user":        rsp_user,
 		})
 	}
 }

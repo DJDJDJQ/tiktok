@@ -18,6 +18,11 @@ func CreateFavorite(userId int64, videoId int64) int {
 		//特殊情况导致插入失败
 		return -1
 	}
+	// 更新点赞视频数和获赞数
+	UpdateFavoriteCount(userId, 1)
+	var authorId int64
+	Mysql.Model(&Video{}).Select("user_id").Where("id = ?", videoId).Find(&authorId)
+	UpdateTotalFavoritedCount(authorId, 1)
 	return 0
 }
 
@@ -27,6 +32,11 @@ func DeleteFavorite(temp Favorite) int {
 		//特殊情况导致删除失败
 		return -1
 	}
+	// 更新点赞视频数和获赞数
+	UpdateFavoriteCount(temp.UserId, -1)
+	var authorId int64
+	Mysql.Model(&Video{}).Select("user_id").Where("id = ?", temp.VideoId).Find(&authorId)
+	UpdateTotalFavoritedCount(authorId, 1)
 	return 0
 }
 

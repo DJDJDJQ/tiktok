@@ -31,21 +31,25 @@ type Res_Comment struct {
 }
 
 type Res_User struct {
-	Id            int64  `json:"id"`
-	Name          string `json:"name"`
-	FollowCount   int64  `json:"follow_count,omitempty"`
-	FollowerCount int64  `json:"follower_count,omitempty"`
-	IsFollow      bool   `json:"is_follow"`
+	Id             int64  `json:"id"`
+	Name           string `json:"name"`
+	FollowCount    int64  `json:"follow_count,omitempty"`
+	FollowerCount  int64  `json:"follower_count,omitempty"`
+	IsFollow       bool   `json:"is_follow"`
+	TotalFavorited int64  `json:"total_favorited,omitempty"`
+	FavoriteCount  int64  `json:"favorite_count,omitempty"`
 }
 
 // 将user转换成Res_User
 func Convert2ResUser(user model.User, isfollow bool) Res_User {
 	var author Res_User = Res_User{
-		Id:            user.Id,
-		Name:          user.Name,
-		FollowCount:   user.FollowCount,
-		FollowerCount: user.FollowerCount,
-		IsFollow:      isfollow,
+		Id:             user.Id,
+		Name:           user.Name,
+		FollowCount:    user.FollowCount,
+		FollowerCount:  user.FollowerCount,
+		IsFollow:       isfollow,
+		TotalFavorited: user.TotalFavorited,
+		FavoriteCount:  user.FavoriteCount,
 	}
 	return author
 }

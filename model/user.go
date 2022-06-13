@@ -27,3 +27,23 @@ func UpdataUserFollowerCount(userId int64, cnt int) {
 	}
 	return
 }
+
+func UpdateTotalFavoritedCount(userId int64, cnt int) {
+	if cnt > 0 {
+		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("total_favorited", gorm.Expr("total_favorited + ?", cnt))
+
+	} else if cnt < 0 {
+		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("total_favorited", gorm.Expr("total_favorited - ?", 0-cnt))
+	}
+	return
+}
+
+func UpdateFavoriteCount(userId int64, cnt int) {
+	if cnt > 0 {
+		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", cnt))
+
+	} else if cnt < 0 {
+		Mysql.Model(&User{}).Where("id = ?", userId).UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 0-cnt))
+	}
+	return
+}
