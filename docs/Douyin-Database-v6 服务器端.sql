@@ -9,11 +9,12 @@ CREATE TABLE `tb_user` (
   `follow_count` int DEFAULT '0' COMMENT '关注数量',
   `follower_count` int DEFAULT '0' COMMENT '粉丝数量',
   `register_time` datetime DEFAULT NULL COMMENT '注册时间',
+  `total_favorited` int DEFAULT '0' COMMENT '获赞数',
+  `favorite_count` int DEFAULT '0' COMMENT '点赞视频数量',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ID_UNIQUE` (`id`),
   UNIQUE KEY `User_name_UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `tb_video` (
   `id` varchar(64) NOT NULL,
