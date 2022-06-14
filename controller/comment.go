@@ -25,11 +25,15 @@ func CommentAction(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
 	}
-	user_id := parseToken.UserId                     //用户id
-	video_id := utils.Str2int64(c.Query("video_id")) //视频id
-	action_type := c.Query("action_type")            //1-发布评论，2-删除评论
-	comment_text := c.Query("comment_text")          //可选，用户填写的评论内容
-	comment_id := c.Query("comment_id")              //可选，要删除的评论id
+	user_id := parseToken.UserId                          //用户id
+	video_id, err := utils.Str2int64(c.Query("video_id")) //视频id
+	if err != nil {
+		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
+	}
+	action_type := c.Query("action_type")   //1-发布评论，2-删除评论
+	comment_text := c.Query("comment_text") //可选，用户填写的评论内容
+	comment_id := c.Query("comment_id")     //可选，要删除的评论id
 
 	//验证参数合法性
 	//TODO检验user_id合法性
@@ -103,8 +107,12 @@ func CommentAction(c *gin.Context) {
 
 // CommentList all videos have same demo comment list
 func CommentList(c *gin.Context) {
-	token := c.Query("token")                        //用户鉴权token
-	video_id := utils.Str2int64(c.Query("video_id")) //视频id
+	token := c.Query("token")                             //用户鉴权token
+	video_id, err := utils.Str2int64(c.Query("video_id")) //视频id
+	if err != nil {
+		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
+	}
 	//判断token
 	//println(token)
 	//不需要登录也可以查看评论

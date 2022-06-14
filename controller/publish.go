@@ -87,7 +87,11 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	user_id := c.Query("user_id")
+	user_id, err := utils.Str2int64(c.Query("user_id"))
+	if err != nil {
+		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
+	}
 	token := c.Query("token")
 	if token == "" {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
@@ -101,11 +105,11 @@ func PublishList(c *gin.Context) {
 	}
 
 	// 查找user_id发布的视频
-	var video_list []model.Video = model.GetVideosByUserId(utils.Str2int64(user_id))
+	var video_list []model.Video = model.GetVideosByUserId(user_id)
 
 	// 查找视频作者
-	var user model.User = model.GetUserById(utils.Str2int64(user_id))
-	isfollow := model.SearchIsFollow(claims.UserId, utils.Str2int64(user_id))
+	var user model.User = model.GetUserById(user_id)
+	isfollow := model.SearchIsFollow(claims.UserId, user_id)
 	var author Res_User = Convert2ResUser(user, isfollow)
 	// 转换为Res_Video
 	var rsp_video_list []Res_Video

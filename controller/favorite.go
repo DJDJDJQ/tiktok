@@ -38,12 +38,13 @@ func FavoriteAction(c *gin.Context) {
 	userId := parseToken.UserId
 
 	// 验证参数合法性
-	videoId := c.Query("video_id")
-	actionType := c.Query("action_type")
-	if videoId == "" {
+	videoId, err := utils.Str2int64(c.Query("video_id"))
+	if err != nil {
 		c.JSON(http.StatusOK, pkg.ParamErr)
 		return
-	} else if actionType != "1" && actionType != "2" {
+	}
+	actionType := c.Query("action_type")
+	if actionType != "1" && actionType != "2" {
 		c.JSON(http.StatusOK, pkg.ParamErr)
 		return
 	}
@@ -53,12 +54,12 @@ func FavoriteAction(c *gin.Context) {
 	// 判断赞操作action_type
 	if actionType == "1" {
 		if res.RowsAffected == 0 {
-			if code := model.CreateFavorite(userId, utils.Str2int64(videoId)); code == -1 {
+			if code := model.CreateFavorite(userId, videoId); code == -1 {
 				c.JSON(http.StatusOK, pkg.DataBaseErr.WithMessage("Favorite action failed"))
 				return
 			}
 			// 点赞完成，更新video点赞数+1
-			model.UpdataVideoFavoriteCount(utils.Str2int64(videoId), 1)
+			model.UpdataVideoFavoriteCount(videoId, 1)
 
 			c.JSON(http.StatusOK, pkg.Success)
 			return
@@ -75,7 +76,7 @@ func FavoriteAction(c *gin.Context) {
 				return
 			}
 			// 取消点赞完成，更新video点赞数-1
-			model.UpdataVideoFavoriteCount(utils.Str2int64(videoId), -1)
+			model.UpdataVideoFavoriteCount(videoId, -1)
 
 			c.JSON(http.StatusOK, pkg.Success)
 			return
@@ -85,7 +86,11 @@ func FavoriteAction(c *gin.Context) {
 
 // FavoriteList all users have same favorite video list
 func FavoriteList(c *gin.Context) {
-	user_id := c.Query("user_id")
+	user_id, err := utils.Str2int64(c.Query("user_id"))
+	if err != nil {
+		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
+	}
 	token := c.Query("token")
 	if token == "" {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
@@ -95,7 +100,7 @@ func FavoriteList(c *gin.Context) {
 	if token == "" {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
 	}
-	// // 解析token获取user_id
+	// 解析token获取user_id
 	claims, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)

@@ -50,6 +50,14 @@ func Register(c *gin.Context) {
 		})
 		return
 	}
+	if !utils.FilterSQLInject(username) {
+		c.JSON(http.StatusOK, Response{StatusCode: 3, StatusMsg: "用户名不能包含特殊字符"})
+		return
+	}
+	if !utils.FilterSQLInject(password) {
+		c.JSON(http.StatusOK, Response{StatusCode: 3, StatusMsg: "密码不能包含特殊字符"})
+		return
+	}
 	//密码必须同时包含字母和数字，且长度为6-16
 	expr := `^(?![a-zA-Z]+$)(?![0-9]+$)[0-9A-Za-z]{6,16}$`
 	reg, _ := regexp2.Compile(expr, 0)
@@ -70,7 +78,7 @@ func Register(c *gin.Context) {
 
 	if res.RowsAffected != 0 { //重复注册
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
+			Response: Response{StatusCode: 1, StatusMsg: "用户名已存在"},
 		})
 	} else {
 		newUser := model.User{
@@ -106,6 +114,14 @@ func Login(c *gin.Context) {
 			"status_code": 2,
 			"status_msg":  "账号或密码为空",
 		})
+		return
+	}
+	if !utils.FilterSQLInject(username) {
+		c.JSON(http.StatusOK, Response{StatusCode: 3, StatusMsg: "用户名不能包含特殊字符"})
+		return
+	}
+	if !utils.FilterSQLInject(password) {
+		c.JSON(http.StatusOK, Response{StatusCode: 3, StatusMsg: "密码不能包含特殊字符"})
 		return
 	}
 

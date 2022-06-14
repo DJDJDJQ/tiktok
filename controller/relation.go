@@ -26,21 +26,23 @@ func RelationAction(c *gin.Context) {
 	parseToken, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 	userId := parseToken.UserId
 
-	toUserId := c.Query("to_user_id")
-	actionType := c.Query("action_type")
-	if toUserId == "" {
+	toUserId, err := utils.Str2int64(c.Query("to_user_id"))
+	if err != nil {
 		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
 	}
+	actionType := c.Query("action_type")
 
 	var temp model.Follow
 	res := model.Mysql.Model(&model.Follow{}).Where("user_id=? and follow_id=?", userId, toUserId).Find(&temp)
 	switch actionType {
 	case "1": //关注
 		if res.RowsAffected == 0 {
-			response := service.Follow(userId, utils.Str2int64(toUserId))
+			response := service.Follow(userId, toUserId)
 			c.JSON(http.StatusOK, response)
 		} else {
 			c.JSON(http.StatusOK, pkg.RecordAlreadyExistErr)
@@ -49,7 +51,7 @@ func RelationAction(c *gin.Context) {
 		if res.RowsAffected == 0 {
 			c.JSON(http.StatusOK, pkg.RecordNotExistErr)
 		} else {
-			response := service.CancelFollow(temp, userId, utils.Str2int64(toUserId))
+			response := service.CancelFollow(temp, userId, toUserId)
 			c.JSON(http.StatusOK, response)
 		}
 	default:
@@ -64,15 +66,17 @@ func FollowList(c *gin.Context) {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
 		return
 	}
-	// // 解析token获取user_id
+	// 解析token获取user_id
 	claims, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 
-	userId := c.Query("user_id")
-	if userId == "" {
+	userId, err := utils.Str2int64(c.Query("user_id"))
+	if err != nil {
 		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
 	}
 
 	var followId_list []int64
@@ -107,11 +111,13 @@ func FollowerList(c *gin.Context) {
 	claims, err := utils.ParseToken(token)
 	if err != nil {
 		c.JSON(http.StatusOK, pkg.TokenInvalidErr)
+		return
 	}
 
-	userId := c.Query("user_id")
-	if userId == "" {
+	userId, err := utils.Str2int64(c.Query("user_id"))
+	if err != nil {
 		c.JSON(http.StatusOK, pkg.ParamErr)
+		return
 	}
 
 	var followerId_list []int64
